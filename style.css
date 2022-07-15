@@ -1,0 +1,29 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.main {
+  width: 70vw;
+  margin: 50vh auto;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.container {
+  width: 75px;
+  height: 75px;
+  border: 5px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.div--active {
+  border-color: yellow;
+}
