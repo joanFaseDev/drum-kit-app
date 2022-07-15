@@ -27,14 +27,21 @@ function testKey(code) {
   return keyCodes.some((element) => element === code);
 }
 
-/* */
-function activateClass(keyCode) {
+/* Activate / Deactivate the visual feedback when a key is pressed/released */
+function toggleClass(keyCode) {
   const div = document.querySelector(`.container-${keyCode}`);
-  div.classList.add(`div--active`);
+  const body = document.querySelector(`body`);
+  div.classList.toggle(`div--active`);
+  div.firstElementChild.classList.toggle(`p--active`);
+  div.lastElementChild.classList.toggle(`span--active`);
+  body.classList.toggle(`body--active`);
 }
 
 /* */
-function deactivateClass(evt) {}
+function deactivateClass(evt) {
+  const div = document.querySelector(`.container-${evt.code}`);
+  div.classList.remove(`div--active`);
+}
 
 /* Initialize Audio object with the sound bind to the key being pressed then return it*/
 function createSound(key) {
@@ -46,34 +53,41 @@ function createSound(key) {
 /* Check if the sound can be entirely played and, if yes, play it */
 function playDrum(sound) {
   sound.addEventListener(`canplaythrough`, (evt) => {
-    console.log(`No Problem! ${evt}`);
     sound.play();
   });
 }
 
+/* Check if the key being pressed have been released (goal here is to prevent a drum sound loop) */
 function isPressed(code) {
-  console.log(`The key is ${keyPressed[code]}`);
   return keyPressed[code];
+}
+
+/* Switch the present state of a key to its opposite */
+function toggleKeyState(code) {
+  keyPressed[code] = !keyPressed[code];
 }
 
 /* Is triggered when a key is pressed */
 document.addEventListener(`keydown`, (evt) => {
   const keyCode = evt.code;
-  if (testKey(keyCode)) {
-    activateClass(keyCode);
-    const sound = createSound(keyCode);
-    playDrum(sound);
-  } else {
-    console.log(`${keyCode} is not bind with any particular sound.`);
+  if (!isPressed(keyCode)) {
+    if (testKey(keyCode)) {
+      toggleClass(keyCode);
+      const sound = createSound(keyCode);
+      playDrum(sound);
+      toggleKeyState(keyCode);
+    } else {
+      console.log(`${keyCode} is not bind with any particular sound.`);
+    }
   }
 });
 
 /* Is triggered when a key is released */
 document.addEventListener(`keyup`, (evt) => {
-  console.dir(evt);
-  if (testKey(evt.code)) {
-    const div = document.querySelector(`.container-${evt.code}`);
-    console.log(div);
-    div.classList.remove(`div--active`);
+  if (testKey(evt.code) && isPressed(evt.code)) {
+    toggleClass(evt.code);
+    // const div = document.querySelector(`.container-${evt.code}`);
+    // div.classList.remove(`div--active`);
+    toggleKeyState(evt.code);
   }
 });
